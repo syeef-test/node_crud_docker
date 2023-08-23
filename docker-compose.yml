@@ -6,14 +6,14 @@ services:
     build: .
     image: kazisyeef/node_docker_app
     ports:
-      - "3000" : "3000"
+      - "3000:3000"  # Corrected port mapping syntax
     environment:
       - PG_DB=node_docker_db
       - PG_USER=kazisyeef
       - PG_PASSWORD=12345
-      - PG_HOST=ndoe_db
+      - PG_HOST=node_db  # Corrected typo
     depends_on:
-      - ndoe_db
+      - node_db  # Corrected service name
     restart: always
 
   node_db:
@@ -27,5 +27,6 @@ services:
       - POSTGRES_PASSWORD=12345
     volumes:
       - node_db_data:/var/lib/postgresql/data
-  volumes:
-    node_db_data: {}
+
+volumes:
+  node_db_data: {}

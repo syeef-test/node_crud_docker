@@ -1,33 +1,31 @@
 const express = require("express");
-
-const bodyparser = require("body-parser");
-
+const bodyParser = require("body-parser");
 const sequelize = require("./util/database");
-
 const userModel = require("./models/userModel");
-
 const app = express();
 
-app.use(bodyparser.json());
-app.use(bodyparser.urlencoded({ extended: false }));
+app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({ extended: false }));
 
 app.use((req, res, next) => {
-  res.setHeader("Access-Control-Allow-Orgin", "*");
-  res.setMethods("Access-Control-Allow-Methods", "GET,PUT,POST,PATCH,DELETE");
+  res.setHeader("Access-Control-Allow-Origin", "*");
+  res.setHeader(
+    "Access-Control-Allow-Methods",
+    "GET, PUT, POST, PATCH, DELETE"
+  );
+  res.setHeader("Access-Control-Allow-Headers", "Content-Type, Authorization");
   next();
 });
 
-//test route
+// Test route
 app.get("/", (req, res, next) => {
   res.send("hello world");
 });
 
-//crude routes
-
+// CRUD routes
 app.use("/users", require("./routes/userRoute"));
 
-//error handling
-
+// Error handling
 app.use((error, req, res, next) => {
   console.log(error);
   const status = error.statusCode || 500;
@@ -35,11 +33,13 @@ app.use((error, req, res, next) => {
   res.status(status).json({ message: message });
 });
 
-//sync database
+// Sync database
 sequelize
   .sync()
   .then((result) => {
-    console.log("database is connected");
-    app.listen(3000);
+    console.log("Database is connected");
+    app.listen(3000, () => {
+      console.log("Server is running on port 3000");
+    });
   })
   .catch((err) => console.log(err));

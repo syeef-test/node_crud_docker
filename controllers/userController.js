@@ -1,8 +1,8 @@
 const userModel = require("../models/userModel");
 
-//CRUD controllers
+// CRUD controllers
 
-//get all user
+// get all users
 exports.getUsers = (req, res, next) => {
   userModel
     .findAll()
@@ -12,8 +12,7 @@ exports.getUsers = (req, res, next) => {
     .catch((err) => console.log(err));
 };
 
-//get users by id
-
+// get user by id
 exports.getUser = (req, res, next) => {
   const userId = req.params.userId;
   userModel
@@ -21,33 +20,37 @@ exports.getUser = (req, res, next) => {
     .then((user) => {
       if (!user) {
         res.status(404).json({ message: "No User Found" });
+      } else {
+        res.status(200).json({ user: user });
       }
-      res.status(200).json({ user: user });
     })
     .catch((err) => console.log(err));
 };
 
-//create user
-
+// create user
 exports.createUser = (req, res, next) => {
   const name = req.body.name;
   const email = req.body.email;
 
+  console.log(name, email);
+
   userModel
     .create({ name: name, email: email })
-    .then((result) => {
+    .then((user) => {
       console.log("user created");
       res
         .status(201)
-        .json({ message: "User created succesfully", user: result });
+        .json({ message: "User created successfully", user: user });
     })
-    .catch((err) => console.log(err));
+    .catch((err) => {
+      console.error("Error creating user:", err);
+      res.status(500).json({ message: "User creation failed" });
+    });
 };
 
-//update user
-
+// update user
 exports.updateUser = (req, res, next) => {
-  const userId = req.params.id;
+  const userId = req.params.userId; // Changed "id" to "userId" for consistency
   const updatedName = req.body.name;
   const updatedEmail = req.body.email;
 
@@ -59,16 +62,15 @@ exports.updateUser = (req, res, next) => {
       }
       user.name = updatedName;
       user.email = updatedEmail;
-      return user.save();
+      return user.save(); // Return the Promise to the next then block
     })
-    .then((result) =>
-      res.status(200).json({ message: "User Updated", user: result })
-    )
+    .then((updatedUser) => {
+      res.status(200).json({ message: "User Updated", user: updatedUser });
+    })
     .catch((err) => console.log(err));
 };
 
-//delete user
-
+// delete user
 exports.deleteUser = (req, res, next) => {
   const userId = req.params.userId;
   userModel
@@ -76,11 +78,12 @@ exports.deleteUser = (req, res, next) => {
     .then((user) => {
       if (!user) {
         res.status(404).json({ message: "No User Found" });
+      } else {
+        return userModel.destroy({ where: { id: userId } });
       }
-      return userModel.destroy({ where: { id: userId } });
     })
-    .then((result) =>
-      res.status(200).json({ message: "User deleted succesfully" })
-    )
+    .then((result) => {
+      res.status(200).json({ message: "User deleted successfully" });
+    })
     .catch((err) => console.log(err));
 };
